@@ -7,7 +7,7 @@ with a tuple as key.
 
 This way all operations regarding sorting is given for granted within a bulletproof cache.
 
-For performance reasons, the insert, update and delete operations require the previous score.
+For performance reasons, update and delete operations require the previous score.
 
 Supports:
 
@@ -22,7 +22,7 @@ Supports:
     - :tuples : [{{score, id}, detail}, ...]
     - :map_list : [%{id: id, detail: detail, score: score}, ...]
     - :position_map : %{1: %{id: id, detail: detail, score: score}, 2: ...}
-    - :score_position_map : %{score: %{id: id, detail: detail, position: position}, 2: ...}
+    - :score_position_map : %{score_value => %{id: id, detail: detail, position: position}, ...}
   
 # Benchmarking
 
