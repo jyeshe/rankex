@@ -19,6 +19,24 @@ defmodule RankexTest do
     assert [id] == Rankex.all_with(score)
   end
 
+  test "insert_all/1 and top/1" do
+    Rankex.init()
+    records =
+      for _i <- 1..3 do
+        id = random_id()
+        score = random_score()
+        detail = "name#{id}"
+        {{score, id}, detail}
+      end
+
+    top = Rankex.top(10)
+    assert [] == top
+    Rankex.insert_many(records)
+    top = Rankex.top(10)
+    assert is_list(top)
+    assert top == Enum.sort_by(records, &(elem(&1, 0)), :desc)
+  end
+
   test "insert/3, position/1 and position_by_id/1" do
     Rankex.init()
     id = random_id()

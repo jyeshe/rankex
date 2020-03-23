@@ -51,7 +51,7 @@ defmodule Rankex do
   Creates named table.
   """
   def init(table) do
-    :ets.new(table, [:ordered_set, :named_table])
+    :ets.new(table, [:ordered_set, :named_table, :public])
   end
 
   @doc """
@@ -97,6 +97,22 @@ defmodule Rankex do
   """
   def insert(table, id, new_score, detail) do
     :ets.insert(table, {{new_score, id}, detail})
+  end
+
+  @doc """
+  Inserts and sorts many item on ranking.
+
+  Params:
+  list: [{{score, id}, detail}, ...]
+  """
+  def insert_many(record_list) do
+    insert_many(@table, record_list)
+  end
+  @doc """
+  Inserts and sorts item on ranking (of named table).
+  """
+  def insert_many(table, record_list) do
+    :ets.insert(table, record_list)
   end
 
   @doc """
