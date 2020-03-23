@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.21.3">
     <meta name="project" content="rankex v0.1.0">
-    <title>API Reference — rankex v0.1.0</title>
+    <title>RankEx — rankex v0.1.0</title>
     <link rel="stylesheet" href="dist/elixir-0ab8a6a80ebaaa287431.css" />
-      <link rel="canonical" href="https://hexdocs.pm/rankex/api-reference.html" />
+      <link rel="canonical" href="https://hexdocs.pm/rankex/readme.html" />
     <script src="dist/sidebar_items-43996b4cd2.js"></script>
       <script src="docs_config.js"></script>
     <script async src="dist/app-a225d03098e64fef431a.js"></script>
@@ -63,27 +63,66 @@ rankex      </a>
   <div class="content-outer">
     <div id="content" class="content-inner">
 
-<h1>
-  <small class="app-vsn">rankex v0.1.0</small>
-  API Reference
-</h1>
-
-  <section class="details-list">
-    <h2 id="modules" class="section-heading">
-  <a href="#modules" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
-  Modules
+<h1>RankEx</h1>
+<p>A ranking/leaderboard library for Elixir based on ETS.</p>
+<p>It maps score (integer or float) to a integer id or UUID along with any other 
+data (name of the ranker). </p>
+<p>It&#39;s leveraged on ETS ordered set once it can also order some kinds of records 
+with a tuple as key.</p>
+<p>This way all operations regarding sorting is given for granted within a bulletproof cache.</p>
+<p>For performance reasons, update and delete operations require the previous score which 
+allows this mapping (id-&gt;score) to be stored in users cache without duplicity.</p>
+<p>Supports:</p>
+<ul>
+<li>Fast insertion
+</li>
+<li>Fast update
+</li>
+<li>Fast delete
+</li>
+<li>Position by score (thousand reads in 300ms) or id 
+</li>
+<li>Detail field that might be used for rank names or other info 
+</li>
+<li>All with operation for tied score
+</li>
+<li>Multiple tables
+</li>
+<li><p>Top N results in different formats:</p>
+<ul>
+<li>:tuples : [{{score, id}, detail}, ...]
+</li>
+<li>:map_list : [%{id: id, detail: detail, score: score}, ...]
+</li>
+<li>:position_map : %{1: %{id: id, detail: detail, score: score}, 2: ...}
+</li>
+<li>:score_position_map : %{score_value =&gt; %{id: id, detail: detail, position: position}, ...}
+</li>
+</ul>
+</li>
+</ul>
+<h1>Benchmarking</h1>
+<p>insert/3 for 10000 items: 30ms</p>
+<p>After inserting one million records:</p>
+<p> delete/2 for 10000 items: 7ms
+ update/4 for 10000 items: 37ms
+ position_in/1 for 1000 items: 310ms</p>
+<p>Running on Intel(R) Core(TM) i7-8550U CPU @ 1.80GHz and DDR4 2400 MT/s</p>
+<h2 id="installation" class="section-heading">
+  <a href="#installation" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Installation
 </h2>
 
-    <div class="summary">
-<div class="summary-row">
-  <div class="summary-signature">
-    <a href="Rankex.html">Rankex</a>
-  </div>
-    <div class="summary-synopsis"><p>A ranking/leaderboard library for Elixir based on ETS.</p></div>
-</div>
-    </div>
-  </section>
-
+<p>If <a href="https://hex.pm/docs/publish">available in Hex</a>, the package can be installed
+by adding <code class="inline">benchmarking</code> to your list of dependencies in <code class="inline">mix.exs</code>:</p>
+<pre><code class="nohighlight makeup elixir"><span class="kd">def</span><span class="w"> </span><span class="nf">deps</span><span class="w"> </span><span class="k" data-group-id="0379474254-1">do</span><span class="w">
+  </span><span class="p" data-group-id="0379474254-2">[</span><span class="w">
+    </span><span class="p" data-group-id="0379474254-3">{</span><span class="ss">:rankex</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;~&gt; 0.1.0&quot;</span><span class="p" data-group-id="0379474254-3">}</span><span class="w">
+  </span><span class="p" data-group-id="0379474254-2">]</span><span class="w">
+</span><span class="k" data-group-id="0379474254-1">end</span></code></pre>
+<p>Documentation can be generated with <a href="https://github.com/elixir-lang/ex_doc">ExDoc</a>
+and published on <a href="https://hexdocs.pm">HexDocs</a>. Once published, the docs can
+be found at <a href="https://hexdocs.pm/benchmarking">https://hexdocs.pm/benchmarking</a>.</p>
       <footer class="footer">
         <p>
           <span class="line">

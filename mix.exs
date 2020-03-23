@@ -18,6 +18,9 @@ defmodule Rankex.MixProject do
       deps: deps(),
       package: package(),
       source_url: "https://github.com/jyeshe/rankex",
+      docs: [
+        main: "Rankex",
+      ]
     ]
   end
 

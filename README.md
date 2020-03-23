@@ -2,7 +2,8 @@
 
 A ranking/leaderboard library for Elixir based on ETS.
 
-It maps score (integer or float) to a integer id or UUID. 
+It maps score (integer or float) to a integer id or UUID along with any other 
+data (name of the ranker). 
 
 It's leveraged on ETS ordered set once it can also order some kinds of records 
 with a tuple as key.
