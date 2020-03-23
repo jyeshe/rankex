@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.21.3">
+    <meta name="project" content="rankex v0.1.0">
+    <title>Rankex — rankex v0.1.0</title>
+    <link rel="stylesheet" href="dist/elixir-0ab8a6a80ebaaa287431.css" />
+      <link rel="canonical" href="https://hexdocs.pm/rankex/Rankex.html" />
+    <script src="dist/sidebar_items-f22ab87aed.js"></script>
+      <script src="docs_config.js"></script>
+    <script async src="dist/app-a225d03098e64fef431a.js"></script>
+  </head>
+  <body data-type="modules">
+    <script>try { if(localStorage.getItem('night-mode') === 'true') document.body.className += ' night-mode'; } catch (e) { }</script>
+<div class="main">
+
+<button class="sidebar-button sidebar-toggle">
+  <span class="icon-menu" title="Collapse/expand sidebar"></span>
+</button>
+
+<section class="sidebar">
+  <form class="sidebar-search" action="search.html">
+    <button type="submit" class="search-button">
+      <span class="icon-search" aria-hidden="true"></span>
+    </button>
+    <button type="button" tabindex="-1" class="search-close-button">
+      <span class="icon-cross" title="Cancel search"></span>
+    </button>
+    <label class="search-label">
+      <input name="q" type="text" id="search-list" class="search-input" placeholder="Search..." aria-label="Search" autocomplete="off" />
+    </label>
+  </form>
+
+  <div class="autocomplete">
+    <div class="autocomplete-results">
+    </div>
+  </div>
+
+  <div class="sidebar-header">
+    <div class="sidebar-projectDetails">
+      <a href="api-reference.html" class="sidebar-projectName">
+rankex      </a>
+      <h2 class="sidebar-projectVersion">
+        v0.1.0
+      </h2>
+    </div>
+  </div>
+
+  <ul class="sidebar-listNav">
+    <li><a id="extras-list" href="#full-list">Pages</a></li>
+
+      <li><a id="modules-list" href="#full-list">Modules</a></li>
+
+  </ul>
+  <div class="gradient"></div>
+  <ul id="full-list" class="sidebar-fullList"></ul>
+</section>
+
+<section class="content">
+  <div class="content-outer">
+    <div id="content" class="content-inner">
+
+      <h1>
+        <small class="app-vsn">rankex v0.1.0</small>
+Rankex          <a href="https://github.com/jyeshe/rankex/blob/master/lib/rankex.ex#L1" title="View Source" class="view-source" rel="help">
+            <span class="icon-code" aria-hidden="true"></span>
+            <span class="sr-only">View Source</span>
+          </a>
+      </h1>
+
+
+        <section id="moduledoc">
+<p>A ranking/leaderboard library for Elixir based on ETS.</p>
+<p>It&#39;s leveraged on ETS ordered set once it can also order some kinds of records
+with a tuple as key.</p>
+<p>This way all operations regarding sorting is given for granted within a bulletproof cache.</p>
+<p>For performance reasons, update and delete operations require the previous score.</p>
+<p>Supports:</p>
+<ul>
+<li>Fast insertion
+</li>
+<li>Fast update
+</li>
+<li>Fast delete
+</li>
+<li>Position by score (thousand reads in 300ms) or id
+</li>
+<li>Detail field that might be used for rank names or other info
+</li>
+<li>All with operation for tied score
+</li>
+<li>Multiple tables
+</li>
+<li><p>Top N results in different formats:</p>
+<ul>
+<li>:tuples : [{{score, id}, detail}, ...]
+</li>
+<li>:map_list : [%{id: id, detail: detail, score: score}, ...]
+</li>
+<li>:position_map : %{1: %{id: id, detail: detail, score: score}, 2: ...}
+</li>
+<li>:score_position_map : %{score_value =&gt; %{id: id, detail: detail, position: position}, ...}
+</li>
+</ul>
+</li>
+</ul>
+<h1>Benchmarking</h1>
+<p>insert/3 for 10000 items: 30ms</p>
+<p>After inserting one million records:</p>
+<p>delete/2 for 10000 items: 7ms
+update/4 for 10000 items: 37ms
+position_in/1 for 1000 items: 310ms</p>
+<p>Running on Intel(R) Core(TM) i7-8550U CPU @ 1.80GHz and DDR4 2400 MT/s</p>
+        </section>
+
+        <section id="summary" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#summary">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+            Summary
+          </h1>
+  <div class="summary-functions summary">
+    <h2>
+      <a href="#functions">Functions</a>
+    </h2>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#all_with/1">all_with(score)</a>
+  </div>
+    <div class="summary-synopsis"><p>All items with certain score.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#all_with/2">all_with(table, score)</a>
+  </div>
+    <div class="summary-synopsis"><p>All items with certain score (in a named table).</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#delete/2">delete(id, prev_stored_score)</a>
+  </div>
+    <div class="summary-synopsis"><p>Deletes item from ranking.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#delete/3">delete(table, id, prev_stored_score)</a>
+  </div>
+    <div class="summary-synopsis"><p>Deletes item from ranking (of named table).</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#init/0">init()</a>
+  </div>
+    <div class="summary-synopsis"><p>Creates default table.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#init/1">init(table)</a>
+  </div>
+    <div class="summary-synopsis"><p>Creates named table.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#insert/3">insert(id, new_score, detail)</a>
+  </div>
+    <div class="summary-synopsis"><p>Inserts and sorts item on ranking.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#insert/4">insert(table, id, new_score, detail)</a>
+  </div>
+    <div class="summary-synopsis"><p>Inserts and sorts item on ranking (of named table).</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#position_by_id/1">position_by_id(id)</a>
+  </div>
+    <div class="summary-synopsis"><p>Gives the position/rank for an item with given id.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#position_by_id/2">position_by_id(table, id)</a>
+  </div>
+    <div class="summary-synopsis"><p>Gives the position/rank for an item with given id (in named table).</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#position_in/2">position_in(score, rank_size)</a>
+  </div>
+    <div class="summary-synopsis"><p>Gives the position/rank for an item with given score.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#position_in/3">position_in(table, score, rank_size)</a>
+  </div>
+    <div class="summary-synopsis"><p>Gives the position/rank for an item with given score (in named table).</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#top/2">top(num, mode \\ :tuples)</a>
+  </div>
+    <div class="summary-synopsis"><p>Returns the top N items of the ranking.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#top/3">top(table, num, mode)</a>
+  </div>
+    <div class="summary-synopsis"><p>Returns the top N items of the ranking (for a named table).</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#update/4">update(id, prev_stored_score, new_score, detail)</a>
+  </div>
+    <div class="summary-synopsis"><p>Updates score and position of an item on ranking.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#update/5">update(table, id, prev_stored_score, new_score, detail)</a>
+  </div>
+    <div class="summary-synopsis"><p>Updates score and position of an item on ranking (of named table).</p></div>
+</div>
+  </div>
+        </section>
+
+        <section id="functions" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#functions">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+Functions          </h1>
+          <div class="functions-list">
+<section class="detail" id="all_with/1">
+  <div class="detail-header">
+    <a href="#all_with/1" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">all_with(score)</h1>
+      <a href="https://github.com/jyeshe/rankex/blob/master/lib/rankex.ex#L59" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+  </div>
+  <section class="docstring">
+<p>All items with certain score.</p>
+  </section>
+</section>
+<section class="detail" id="all_with/2">
+  <div class="detail-header">
+    <a href="#all_with/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">all_with(table, score)</h1>
+      <a href="https://github.com/jyeshe/rankex/blob/master/lib/rankex.ex#L65" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+  </div>
+  <section class="docstring">
+<p>All items with certain score (in a named table).</p>
+  </section>
+</section>
+<section class="detail" id="delete/2">
+  <div class="detail-header">
+    <a href="#delete/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">delete(id, prev_stored_score)</h1>
+      <a href="https://github.com/jyeshe/rankex/blob/master/lib/rankex.ex#L73" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+  </div>
+  <section class="docstring">
+<p>Deletes item from ranking.</p>
+  </section>
+</section>
+<section class="detail" id="delete/3">
+  <div class="detail-header">
+    <a href="#delete/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">delete(table, id, prev_stored_score)</h1>
+      <a href="https://github.com/jyeshe/rankex/blob/master/lib/rankex.ex#L79" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+  </div>
+  <section class="docstring">
+<p>Deletes item from ranking (of named table).</p>
+  </section>
+</section>
+<section class="detail" id="init/0">
+  <div class="detail-header">
+    <a href="#init/0" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">init()</h1>
+      <a href="https://github.com/jyeshe/rankex/blob/master/lib/rankex.ex#L46" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+  </div>
+  <section class="docstring">
+<p>Creates default table.</p>
+  </section>
+</section>
+<section class="detail" id="init/1">
+  <div class="detail-header">
+    <a href="#init/1" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">init(table)</h1>
+      <a href="https://github.com/jyeshe/rankex/blob/master/lib/rankex.ex#L52" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+  </div>
+  <section class="docstring">
+<p>Creates named table.</p>
+  </section>
+</section>
+<section class="detail" id="insert/3">
+  <div class="detail-header">
+    <a href="#insert/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">insert(id, new_score, detail)</h1>
+      <a href="https://github.com/jyeshe/rankex/blob/master/lib/rankex.ex#L91" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+  </div>
+  <section class="docstring">
+<p>Inserts and sorts item on ranking.</p>
+<p>Params:
+id: integer, UUID, etc.
+new_score: integer or float
+detail: might be the name of a person on the raking or any other detail related to the id.</p>
+  </section>
+</section>
+<section class="detail" id="insert/4">
+  <div class="detail-header">
+    <a href="#insert/4" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">insert(table, id, new_score, detail)</h1>
+      <a href="https://github.com/jyeshe/rankex/blob/master/lib/rankex.ex#L97" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+  </div>
+  <section class="docstring">
+<p>Inserts and sorts item on ranking (of named table).</p>
+  </section>
+</section>
+<section class="detail" id="position_by_id/1">
+  <div class="detail-header">
+    <a href="#position_by_id/1" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">position_by_id(id)</h1>
+      <a href="https://github.com/jyeshe/rankex/blob/master/lib/rankex.ex#L135" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+  </div>
+  <section class="docstring">
+<p>Gives the position/rank for an item with given id.</p>
+<p>This is much slower than position/1 once the table is sorted by score.</p>
+  </section>
+</section>
+<section class="detail" id="position_by_id/2">
+  <div class="detail-header">
+    <a href="#position_by_id/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">position_by_id(table, id)</h1>
+      <a href="https://github.com/jyeshe/rankex/blob/master/lib/rankex.ex#L143" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+  </div>
+  <section class="docstring">
+<p>Gives the position/rank for an item with given id (in named table).</p>
+<p>This is much slower than position/2 once the table is sorted by score.</p>
+  </section>
+</section>
+<section class="detail" id="position_in/2">
+  <div class="detail-header">
+    <a href="#position_in/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">position_in(score, rank_size)</h1>
+      <a href="https://github.com/jyeshe/rankex/blob/master/lib/rankex.ex#L118" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+  </div>
+  <section class="docstring">
+<p>Gives the position/rank for an item with given score.</p>
+  </section>
+</section>
+<section class="detail" id="position_in/3">
+  <div class="detail-header">
+    <a href="#position_in/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">position_in(table, score, rank_size)</h1>
+      <a href="https://github.com/jyeshe/rankex/blob/master/lib/rankex.ex#L124" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+  </div>
+  <section class="docstring">
+<p>Gives the position/rank for an item with given score (in named table).</p>
+  </section>
+</section>
+<section class="detail" id="top/2">
+    <span id="top/1"></span>
+  <div class="detail-header">
+    <a href="#top/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">top(num, mode \\ :tuples)</h1>
+      <a href="https://github.com/jyeshe/rankex/blob/master/lib/rankex.ex#L165" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+  </div>
+  <section class="docstring">
+<p>Returns the top N items of the ranking.</p>
+<p>format for the modes:
+:tuples : [{{score, id}, detail}, ...]
+:map_list : [%{id: id, detail: detail, score: score}, ...]
+:position_map : %{1: %{id: id, detail: detail, score: score}, 2: ...}
+:score_position_map : %{score: %{id: id, detail: detail, position: position}, 2: ...}</p>
+  </section>
+</section>
+<section class="detail" id="top/3">
+  <div class="detail-header">
+    <a href="#top/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">top(table, num, mode)</h1>
+      <a href="https://github.com/jyeshe/rankex/blob/master/lib/rankex.ex#L171" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+  </div>
+  <section class="docstring">
+<p>Returns the top N items of the ranking (for a named table).</p>
+  </section>
+</section>
+<section class="detail" id="update/4">
+  <div class="detail-header">
+    <a href="#update/4" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">update(id, prev_stored_score, new_score, detail)</h1>
+      <a href="https://github.com/jyeshe/rankex/blob/master/lib/rankex.ex#L104" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+  </div>
+  <section class="docstring">
+<p>Updates score and position of an item on ranking.</p>
+  </section>
+</section>
+<section class="detail" id="update/5">
+  <div class="detail-header">
+    <a href="#update/5" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">update(table, id, prev_stored_score, new_score, detail)</h1>
+      <a href="https://github.com/jyeshe/rankex/blob/master/lib/rankex.ex#L110" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+  </div>
+  <section class="docstring">
+<p>Updates score and position of an item on ranking (of named table).</p>
+  </section>
+</section>
+          </div>
+        </section>
+      <footer class="footer">
+        <p>
+          <span class="line">
+            Built using
+            <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener">ExDoc</a> (v0.21.3),
+          </span>
+          <span class="line">
+            designed by
+            <a href="https://twitter.com/dignifiedquire" target="_blank" rel="noopener" title="@dignifiedquire">Friedel Ziegelmayer</a>.
+          </span>
+        </p>
+        <p>
+          <button class="line footer-button display-shortcuts-help">
+            Display keyboard shortcuts
+          </button>
+          <button class="line footer-button night-mode-toggle">
+            Toggle night mode
+          </button>
+          <button class="line footer-button display-quick-switch">
+            Go to a HexDocs package
+          </button>
+          <button class="line footer-button tooltips-toggle">
+            <span class="tooltips-option-disable">Disable tooltips</span>
+            <span class="tooltips-option-enable">Enable tooltips</span>
+          </button>
+        </p>
+      </footer>
+    </div>
+  </div>
+</section>
+</div>
+  </body>
+</html>

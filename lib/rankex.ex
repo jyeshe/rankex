@@ -1,9 +1,42 @@
 defmodule Rankex do
   @moduledoc """
-  Ranking/leaderboard library based on ETS ordered set for Elixir.
+  A ranking/leaderboard library for Elixir based on ETS.
 
-  For performance reasons, the insert, update and delete operations require the previous score.
-  The association between id (of some struct) and a score should be done separately to avoid duplicated operation.
+  It's leveraged on ETS ordered set once it can also order some kinds of records
+  with a tuple as key.
+
+  This way all operations regarding sorting is given for granted within a bulletproof cache.
+
+  For performance reasons, update and delete operations require the previous score which
+  should be already stored in users cache.
+
+  Supports:
+
+    - Fast insertion
+    - Fast update
+    - Fast delete
+    - Position by score (thousand reads in 300ms) or id
+    - Detail field that might be used for rank names or other info
+    - All with operation for tied score
+    - Multiple tables
+    - Top N results in different formats:
+      - :tuples : [{{score, id}, detail}, ...]
+      - :map_list : [%{id: id, detail: detail, score: score}, ...]
+      - :position_map : %{1: %{id: id, detail: detail, score: score}, 2: ...}
+      - :score_position_map : %{score_value => %{id: id, detail: detail, position: position}, ...}
+
+  # Benchmarking
+
+  insert/3 for 10000 items: 30ms
+
+  After inserting one million records:
+
+  delete/2 for 10000 items: 7ms
+  update/4 for 10000 items: 37ms
+  position_in/1 for 1000 items: 310ms
+
+  Running on Intel(R) Core(TM) i7-8550U CPU @ 1.80GHz and DDR4 2400 MT/s
+
   """
   @table :rankex_table
   @eot   :"$end_of_table"
