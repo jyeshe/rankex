@@ -6,8 +6,8 @@ defmodule RankexTest do
   @massive_insert         10_000
   @massive_update         10_000
   @massive_delete         10_000
-  @timed_sample_size       1_000
-  @assert_sample_size      5_000
+  @assert_sample_size      1_000
+  @timed_sample_size         100
 
   test "insert/3 and all_with/1" do
     Rankex.init()
@@ -22,33 +22,50 @@ defmodule RankexTest do
   test "insert_all/1 and top/1" do
     Rankex.init()
     records =
-      for _i <- 1..3 do
+      for _i <- 1..5 do
         id = random_id()
         score = random_score()
         detail = "name#{id}"
         {{score, id}, detail}
       end
 
+    # empty
+    assert 0 == Rankex.size()
     top = Rankex.top(10)
     assert [] == top
+    # assert insert many with top
     Rankex.insert_many(records)
     top = Rankex.top(10)
     assert is_list(top)
     assert top == Enum.sort_by(records, &(elem(&1, 0)), :desc)
   end
 
-  test "insert/3, position/1 and position_by_id/1" do
+  test "insert/3, position_in/2 and position_by_id/1" do
     Rankex.init()
-    id = random_id()
-    score = random_score()
+    id_score_list = for _i <- 1..10, do: {random_id(), random_score()}
+    sorted_list = Enum.sort(id_score_list, fn {_id1, score1}, {_id2, score2} -> score1 > score2 end)
+    score_pos_map =
+      sorted_list
+      |> Enum.with_index(1)
+      |> Enum.into(Map.new(), fn {{_id, score}, pos} -> {score, pos} end)
+    id_pos_map =
+      sorted_list
+      |> Enum.with_index(1)
+      |> Enum.into(Map.new(), fn {{id, _score}, pos} -> {id, pos} end)
 
-    assert nil == Rankex.position_by_id(id)
-    Rankex.insert(id, score, "name#{id}")
-    assert 1 == Rankex.position_in(score, 10)
-    assert 1 == Rankex.position_by_id(id)
+    # empty
+    assert 0 == Rankex.size()
+    # insert each
+    Enum.each(id_score_list, fn {id, score} -> Rankex.insert(id, score, "name#{id}") end)
+    # tests each
+    Enum.each(id_score_list,
+      fn {id, score} ->
+        assert Map.get(score_pos_map, score) == Rankex.position_in(score, 10)
+        assert Map.get(id_pos_map, id) == Rankex.position_by_id(id)
+      end)
   end
 
-  test "[float score] insert/3, position/1 and position_by_id/1" do
+  test "[float score] insert/3, position_in/2 and position_by_id/1" do
     Rankex.init()
     id1 = random_id()
     score1 = 100.0001
@@ -65,7 +82,7 @@ defmodule RankexTest do
     assert 1 == Rankex.position_by_id(id2)
   end
 
-  test "update/4, position/1 and position_by_id/1" do
+  test "update/4, position_in/2 and position_by_id/1" do
     Rankex.init()
     id1 = random_id()
     id2 = random_id()
@@ -284,10 +301,10 @@ defmodule RankexTest do
     assert duration < 1000
   end
 
-  test "timed massive position/1 for #{@timed_sample_size} items" do
+  test "timed massive position_in/2 for #{@timed_sample_size} items" do
     Rankex.init()
     duration = positions_profiling(@timed_sample_size)
-    IO.inspect "position/1 for #{@timed_sample_size} items: #{duration}ms"
+    IO.inspect "position_in/2 for #{@timed_sample_size} items: #{duration}ms"
     assert duration < 1000
   end
 
@@ -324,10 +341,10 @@ defmodule RankexTest do
     assert duration < 1000
   end
 
-  test "massive insert/3 (1mi) and position/1 for #{@assert_sample_size} items" do
+  test "massive insert/3 (1mi) and position_in/2 for #{@assert_sample_size} items" do
     Rankex.init()
     duration = positions_profiling(@assert_sample_size, true)
-    IO.inspect "position/1 for #{@assert_sample_size} items: #{duration}ms"
+    IO.inspect "position_in/1 for #{@assert_sample_size} items: #{duration}ms"
   end
 
   #

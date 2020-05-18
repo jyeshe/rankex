@@ -116,6 +116,19 @@ defmodule Rankex do
   end
 
   @doc """
+  Returns the leader tuple {{score, user_id}, detail}.
+  """
+  def leader() do
+    leader(@table)
+  end
+  @doc """
+  Returns the leader tuple {{score, user_id}, detail} (of named table).
+  """
+  def leader(table) do
+    :ets.last(table)
+  end
+
+  @doc """
   Updates score and position of an item on ranking.
   """
   def update(id, prev_stored_score, new_score, detail) do
@@ -170,6 +183,18 @@ defmodule Rankex do
     end
   end
 
+  @doc """
+  Number of items in the ranking.
+  """
+  def size() do
+    size(@table)
+  end
+  @doc """
+  Number of items in the ranking (of named table).
+  """
+  def size(table) do
+    :ets.info(table, :size)
+  end
   @doc """
   Returns the top N items of the ranking.
 
