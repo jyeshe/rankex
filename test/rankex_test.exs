@@ -8,50 +8,69 @@ defmodule RankexTest do
   @massive_delete         10_000
   @assert_sample_size      1_000
   @timed_sample_size         100
+  @min_sample_size           100
 
   test "insert/3 and all_with/1" do
     Rankex.init()
-    id = random_id()
-    score = random_score()
+    id1 = random_id()
+    score1 = random_score()
 
-    assert [] == Rankex.all_with(score)
-    Rankex.insert(id, score, "name#{id}")
-    assert [id] == Rankex.all_with(score)
+    # assert empty
+    assert [] == Rankex.all_with(score1)
+
+    # assert positive 1
+    Rankex.insert(id1, score1, "name#{id1}")
+    assert [id1] == Rankex.all_with(score1)
+
+    # assert unchanged
+    id2 = id1 + 1
+    score2 = score1 + 1
+    Rankex.insert(id2, score2, "name#{id2}")
+    assert [id1] == Rankex.all_with(score1)
+
+    # assert positive 2
+    id3 = id1 + 1
+    Rankex.insert(id3, score1, "name#{id3}")
+    assert [id1, id3] == Rankex.all_with(score1)
   end
 
   test "insert_all/1 and top/1" do
     Rankex.init()
-    records =
-      for _i <- 1..5 do
-        id = random_id()
-        score = random_score()
-        detail = "name#{id}"
-        {{score, id}, detail}
-      end
 
-    # empty
+    %{id_score_list: id_score_list} = fixture(@min_sample_size)
+
+    # assert empty
     assert 0 == Rankex.size()
-    top = Rankex.top(10)
+    top = Rankex.top(@min_sample_size)
     assert [] == top
-    # assert insert many with top
+
+    records = for {id, score} <- id_score_list, do: {{score, id}, "name#{id}"}
     Rankex.insert_many(records)
-    top = Rankex.top(10)
+
+    # assert inserted with top
+    top = Rankex.top(length(records))
     assert is_list(top)
     assert top == Enum.sort_by(records, &(elem(&1, 0)), :desc)
+
+    # assert top half
+    half_length = div(length(records), 2)
+    top = Rankex.top(half_length)
+    first_half =
+      records
+      |> Enum.sort_by(&(elem(&1, 0)), :desc)
+      |> Enum.take(half_length)
+
+    assert is_list(top)
+    assert top == first_half
   end
 
   test "insert/3, position_in/2 and position_by_id/1" do
     Rankex.init()
-    id_score_list = for _i <- 1..10, do: {random_id(), random_score()}
-    sorted_list = Enum.sort(id_score_list, fn {_id1, score1}, {_id2, score2} -> score1 > score2 end)
-    score_pos_map =
-      sorted_list
-      |> Enum.with_index(1)
-      |> Enum.into(Map.new(), fn {{_id, score}, pos} -> {score, pos} end)
-    id_pos_map =
-      sorted_list
-      |> Enum.with_index(1)
-      |> Enum.into(Map.new(), fn {{id, _score}, pos} -> {id, pos} end)
+    %{
+      id_score_list: id_score_list,
+      score_pos_map: score_pos_map,
+      id_pos_map: id_pos_map
+    } = fixture(@min_sample_size)
 
     # empty
     assert 0 == Rankex.size()
@@ -60,8 +79,14 @@ defmodule RankexTest do
     # tests each
     Enum.each(id_score_list,
       fn {id, score} ->
-        assert Map.get(score_pos_map, score) == Rankex.position_in(score, 10)
-        assert Map.get(id_pos_map, id) == Rankex.position_by_id(id)
+        position1 = Rankex.position_in(score, @min_sample_size)
+        position2 = Rankex.position_by_id(id)
+
+        # assert position1 == position2
+        assert Enum.any?(Map.get(score_pos_map, score), fn pos -> pos == position1 end)
+        if Map.get(id_pos_map, id) == position2 do
+          assert Enum.any?(Rankex.all_with(score), &(&1 == id))
+        end
       end)
   end
 
@@ -112,6 +137,18 @@ defmodule RankexTest do
     assert 3 == Rankex.position_by_id(id1)
     assert 2 == Rankex.position_by_id(id2)
     assert 1 == Rankex.position_by_id(id3)
+  end
+
+  test "leader/0" do
+    Rankex.init()
+    %{id_score_list: id_score_list, sorted_list: sorted_list} = fixture(@min_sample_size)
+
+    for {id, score} <- id_score_list, do: {{score, id}, "name#{id}"}
+    |> Rankex.insert_many()
+
+    {leader_id, leader_score} = hd(sorted_list)
+    assert Rankex.leader().id == leader_id
+    assert Rankex.leader().score == leader_score
   end
 
   test "delete/2 and position_by_id/1" do
@@ -350,8 +387,39 @@ defmodule RankexTest do
   #
   # Internal
   #
-  defp random_id, do: Enum.random(1234567890123456..9876543210123456)
-  defp random_score, do: Enum.random(-100_000_000..100_000_000)
+  defp random_id, do: Enum.random(10_000_000_000_000_000..99_999_999_999_999_999)
+  defp random_score(size \\ :normal)
+  defp random_score(:normal), do: Enum.random(-100_000_000..100_000_000)
+  defp random_score(:small), do: Enum.random(-10..10)
+
+  defp fixture(size) do
+    score_range = if size < 1000, do: :small, else: :normal
+    id_score_list = for _i <- 1..size, do: {random_id(), random_score(score_range)}
+    sorted_list = Enum.sort(id_score_list,
+      fn {id1, score1}, {id2, score2} ->
+        score1 > score2 or (score1 == score2 and id1 > id2)
+      end)
+
+    score_pos_map =
+      sorted_list
+      |> Enum.with_index(1)
+      |> Enum.reduce(Map.new(),
+          fn {{_id, score}, pos}, acc ->
+            Map.update(acc, score, [pos], fn current_list -> current_list ++ [pos] end)
+          end)
+
+    id_pos_map =
+      sorted_list
+      |> Enum.with_index(1)
+      |> Enum.into(Map.new(), fn {{id, _score}, pos} -> {id, pos} end)
+
+    %{
+      id_score_list: id_score_list,
+      id_pos_map: id_pos_map,
+      score_pos_map: score_pos_map,
+      sorted_list: sorted_list
+    }
+  end
 
   defp insert_random_scores(amount) do
     for _i <- 1..amount do

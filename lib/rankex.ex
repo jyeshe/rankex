@@ -127,10 +127,9 @@ defmodule Rankex do
   def leader(table) do
     record = :ets.last(table)
     if record != @eot do
-      {{score, id}, detail} = record
+      {score, id} = record
       %{
         id: id,
-        detail: detail,
         score: score,
       }
     end
