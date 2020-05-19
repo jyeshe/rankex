@@ -116,16 +116,24 @@ defmodule Rankex do
   end
 
   @doc """
-  Returns the leader tuple {{score, user_id}, detail}.
+  Returns a map with leader data or nil.
   """
   def leader() do
     leader(@table)
   end
   @doc """
-  Returns the leader tuple {{score, user_id}, detail} (of named table).
+  Returns a map with leader data or nil (of named table).
   """
   def leader(table) do
-    :ets.last(table)
+    record = :ets.last(table)
+    if record != @eot do
+      {{score, id}, detail} = record
+      %{
+        id: id,
+        detail: detail,
+        score: score,
+      }
+    end
   end
 
   @doc """

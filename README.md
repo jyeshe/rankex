@@ -36,7 +36,7 @@ After inserting one million records:
 
  delete/2 for 10000 items: 7ms
  update/4 for 10000 items: 37ms
- position_in/1 for 1000 items: 310ms
+ position_in/2 for 1000 items: 272ms
 
 Running on Intel(R) Core(TM) i7-8550U CPU @ 1.80GHz and DDR4 2400 MT/s
 
