@@ -1,7 +1,7 @@
 defmodule Rankex.MixProject do
   use Mix.Project
 
-  @version "0.1.2"
+  @version "0.1.3"
 
   @description """
   Ranking/leaderboard library based on ETS ordered set for Elixir.
